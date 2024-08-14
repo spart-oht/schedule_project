@@ -81,13 +81,21 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto) {
-        String sql = "SELECT id, to_do, manager_id, created_at, updated_at FROM todo_list where 1=1";
+        String sql = "SELECT a.id, a.manager_id, a.to_do, b.name, a.created_at, b.updated_at FROM todo_list as a join manager as b on a.manager_id = b.id where 1=1";
         if(!scheduleViewsDto.getUpdatedAt().equals("")){
-            sql += " and updated_at like '%"+scheduleViewsDto.getUpdatedAt()+"%'";
+            sql += " and a.updated_at like '%"+scheduleViewsDto.getUpdatedAt()+"%'";
         }
 
         if(scheduleViewsDto.getManagerId() != null && !scheduleViewsDto.getManagerId().equals("")){
-            sql += " and manager_id = '"+scheduleViewsDto.getManagerId() + "'";
+            sql += " and a.manager_id = '"+scheduleViewsDto.getManagerId() + "'";
+        }
+
+        if((Integer) scheduleViewsDto.getPageSize() != null){
+            sql += " LIMIT " + scheduleViewsDto.getPageSize();
+        }
+
+        if((Integer) scheduleViewsDto.getPageNum() != null){
+            sql += " OFFSET " + scheduleViewsDto.getPageSize() * (scheduleViewsDto.getPageNum() - 1);
         }
 
         List<Schedule> schedules = jdbcTemplate.query(sql, new RowMapper<Schedule>() {

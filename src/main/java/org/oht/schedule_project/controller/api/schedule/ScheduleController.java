@@ -50,7 +50,7 @@ public class ScheduleController {
 
     @GetMapping("/{id}")
     // @PathVariable Long id 사용가능
-    public ResponseEntity<?> scheduleView(@PathVariable Long id){
+    public ResponseEntity<?> scheduleView(@PathVariable Long id) {
 
         Schedule schedule = scheduleService.findIdSchedule(id);
 
@@ -72,13 +72,17 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public ResponseEntity<?> scheduleViews(@RequestBody ScheduleViewsDto scheduleViewsDto){
+    public ResponseEntity<?> scheduleViews(@RequestBody ScheduleViewsDto scheduleViewsDto, @RequestParam int pageNum, @RequestParam int pageSize) {
+
+        // 페이징 처리용
+        scheduleViewsDto.setPageNum(pageNum);
+        scheduleViewsDto.setPageSize(pageSize);
 
         List<Schedule> schedules = scheduleService.schedules(scheduleViewsDto);
 
         List<ScheduleResponseDto> scheduleResponseDtos = new ArrayList<>();
 
-        for(Schedule schedule : schedules){
+        for (Schedule schedule : schedules) {
             scheduleResponseDtos.add(
                     ScheduleResponseDto.builder()
                             .id(schedule.getId())
@@ -101,7 +105,7 @@ public class ScheduleController {
     @PutMapping("/update")
     // 보안에 취약하기 떄문에 PathVariable 은 생략
     // @PathVariable Long id,
-    public ResponseEntity<?> updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto){
+    public ResponseEntity<?> updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto) {
 
         Schedule updateSchedule = scheduleService.updateSchedule(scheduleUpdateDto);
 
@@ -113,7 +117,7 @@ public class ScheduleController {
 
         CommonResponseDto commonResponse;
 
-        if(updateSchedule == null){
+        if (updateSchedule == null) {
             commonResponse = CommonResponseDto.builder()
                     .status(StatusEnum.BAD_REQUEST.getCode())
                     .message("비밀번호가 일치하지 않습니다.")
@@ -133,12 +137,12 @@ public class ScheduleController {
     @DeleteMapping("/delete")
     // 보안에 취약하기 떄문에 PathVariable 은 생략
     // @PathVariable Long id,
-    public ResponseEntity<?> deleteSchedule(@RequestBody ScheduleDeleteDto scheduleDeleteDto){
+    public ResponseEntity<?> deleteSchedule(@RequestBody ScheduleDeleteDto scheduleDeleteDto) {
         boolean deleteSchedule = scheduleService.deleteSchedule(scheduleDeleteDto);
 
         CommonResponseDto commonResponse;
 
-        if(deleteSchedule == true){
+        if (deleteSchedule == true) {
             commonResponse = CommonResponseDto.builder()
                     .status(StatusEnum.OK.getCode())
                     .message("success")
