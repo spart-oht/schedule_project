@@ -1,11 +1,7 @@
 package org.oht.schedule_project.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import org.oht.schedule_project.dto.request.ScheduleInsertDto;
-import org.springframework.cglib.core.Local;
-
-import java.time.LocalDateTime;
+import org.oht.schedule_project.dto.request.schedule.ScheduleInsertDto;
 
 
 @Getter

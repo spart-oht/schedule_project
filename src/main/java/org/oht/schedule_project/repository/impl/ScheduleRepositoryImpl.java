@@ -3,10 +3,11 @@ package org.oht.schedule_project.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.oht.schedule_project.domain.Schedule;
-import org.oht.schedule_project.dto.request.*;
-import org.oht.schedule_project.dto.response.ScheduleResponseDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleDeleteDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleInsertDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleUpdateDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleViewsDto;
 import org.oht.schedule_project.repository.ScheduleRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;

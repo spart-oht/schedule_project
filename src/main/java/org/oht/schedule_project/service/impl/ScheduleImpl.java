@@ -2,17 +2,14 @@ package org.oht.schedule_project.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.oht.schedule_project.domain.Schedule;
-import org.oht.schedule_project.dto.request.*;
-import org.oht.schedule_project.dto.response.CommonResponseDto;
-import org.oht.schedule_project.dto.response.ScheduleResponseDto;
-import org.oht.schedule_project.enums.StatusEnum;
+import org.oht.schedule_project.dto.request.schedule.ScheduleDeleteDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleInsertDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleUpdateDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleViewsDto;
 import org.oht.schedule_project.repository.impl.ScheduleRepositoryImpl;
 import org.oht.schedule_project.service.ScheduleService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

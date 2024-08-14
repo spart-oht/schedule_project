@@ -1,4 +1,4 @@
-package org.oht.schedule_project.dto.request;
+package org.oht.schedule_project.dto.request.schedule;
 
 
 import lombok.Getter;

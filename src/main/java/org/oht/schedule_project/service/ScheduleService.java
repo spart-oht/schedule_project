@@ -2,8 +2,10 @@ package org.oht.schedule_project.service;
 
 
 import org.oht.schedule_project.domain.Schedule;
-import org.oht.schedule_project.dto.request.*;
-import org.springframework.http.ResponseEntity;
+import org.oht.schedule_project.dto.request.schedule.ScheduleDeleteDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleInsertDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleUpdateDto;
+import org.oht.schedule_project.dto.request.schedule.ScheduleViewsDto;
 
 import java.util.List;
 
