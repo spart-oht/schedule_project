@@ -12,130 +12,50 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleImpl implements ScheduleService {
 
-    private final ScheduleRepositoryImpl ScheduleRepository;
+    private final ScheduleRepositoryImpl scheduleRepository;
 
     @Override
-    public ResponseEntity<?> insertSchedule(ScheduleInsertDto ScheduleInsertDto) {
-        Schedule schedule = ScheduleRepository.insertSchedule(ScheduleInsertDto);
+    public Schedule insertSchedule(ScheduleInsertDto ScheduleInsertDto) {
+        Optional<Schedule> schedule = Optional.ofNullable(scheduleRepository.insertSchedule(ScheduleInsertDto).orElseThrow(() -> new RuntimeException("등록에 실패하였습니다.")));
 
-        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.builder()
-                        .id(schedule.getId())
-                        .toDo(schedule.getToDo())
-                        .managerId(schedule.getManagerId())
-                        .createdAt(schedule.getCreatedAt())
-                        .build();
-
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDto)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return schedule.get();
     }
 
     @Override
-    public ResponseEntity<?> schedule(ScheduleViewDto scheduleViewDto) {
-        Schedule schedule = ScheduleRepository.schedule(scheduleViewDto);
-
-        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.builder()
-                .id(schedule.getId())
-                .toDo(schedule.getToDo())
-                .managerId(schedule.getManagerId())
-                .createdAt(schedule.getCreatedAt())
-                .build();
-
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDto)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+    public Schedule findIdSchedule(Long id) {
+        Optional<Schedule> schedule = Optional.of(scheduleRepository.schedule(id).orElse(new Schedule()));
+        return schedule.get();
     }
 
     @Override
-    public ResponseEntity<?> schedules(ScheduleViewsDto scheduleViewsDto){
-        List<Schedule> schedules = ScheduleRepository.schedules(scheduleViewsDto);
+    public List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto){
+        Optional<List<Schedule>> schedules = Optional.of(scheduleRepository.schedules(scheduleViewsDto).orElse(new ArrayList<>()));
 
-        List<ScheduleResponseDto> scheduleResponseDtos = new ArrayList<>();
-
-        for(Schedule schedule : schedules){
-            scheduleResponseDtos.add(
-                    ScheduleResponseDto.builder()
-                    .id(schedule.getId())
-                    .toDo(schedule.getToDo())
-                    .managerId(schedule.getManagerId())
-                    .createdAt(schedule.getCreatedAt())
-                    .build());
-        }
-
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDtos)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return schedules.get();
     }
 
     @Override
-    public ResponseEntity<?> updateSchedule(ScheduleUpdateDto scheduleUpdateDto){
+    public Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto){
         // 해당 메모가 DB에 존재하는지 확인
-        Schedule updateSchedule = ScheduleRepository.updateSchedule(scheduleUpdateDto);
+        Optional<Schedule> updateSchedule = Optional.of(scheduleRepository.updateSchedule(scheduleUpdateDto).orElse(new Schedule()));
 
-        CommonResponseDto commonResponse;
-
-        if(updateSchedule == null){
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.BAD_REQUEST.getCode())
-                    .message("비밀번호가 일치하지 않습니다.")
-                    .data(updateSchedule)
-                    .build();
-        } else {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.OK.getCode())
-                    .message("success")
-                    .data(updateSchedule)
-                    .build();
-        }
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return updateSchedule.get();
     }
 
     @Override
-    public ResponseEntity<?> deleteSchedule(ScheduleDeleteDto scheduleDeleteDto){
+    public boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto){
         // 해당 메모가 DB에 존재하는지 확인
-        Schedule deleteSchedule = ScheduleRepository.deleteSchedule(scheduleDeleteDto);
-
-        CommonResponseDto commonResponse;
-
-        if(deleteSchedule == null){
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.BAD_REQUEST.getCode())
-                    .message("비밀번호가 일치하지 않습니다.")
-                    .data(null)
-                    .build();
-        } else {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.OK.getCode())
-                    .message("success")
-                    .data(null)
-                    .build();
-        }
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        boolean deleteSchedule = scheduleRepository.deleteSchedule(scheduleDeleteDto);
+        return deleteSchedule;
     }
 
 }

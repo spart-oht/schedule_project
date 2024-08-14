@@ -6,18 +6,18 @@ import org.oht.schedule_project.dto.response.ScheduleResponseDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository {
 
-    Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto);
+    Optional<Schedule> insertSchedule(ScheduleInsertDto scheduleInsertDto);
 
-    Schedule schedule(ScheduleViewDto scheduleViewDto);
+    Optional<Schedule> schedule(Long id);
 
-    List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto);
-//
-//
-    Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
-//
-    Schedule deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
+    Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto);
+
+    Optional<Schedule> updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
+
+    boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
 
 }

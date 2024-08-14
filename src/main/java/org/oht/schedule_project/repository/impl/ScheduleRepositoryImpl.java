@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,13 +27,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Transactional
     @Override
-    public Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto){
+    public Optional<Schedule> insertSchedule(ScheduleInsertDto scheduleInsertDto){
 
         Schedule schedule = new Schedule(scheduleInsertDto);
 
         KeyHolder keyHolder = new GeneratedKeyHolder(); // 기본 키를 반환받기 위한 객체
 
-        String sql = "INSERT INTO todo_list (to_do, manager, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO todo_list (to_do, manager_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update( con -> {
                     PreparedStatement preparedStatement = con.prepareStatement(sql,
                             Statement.RETURN_GENERATED_KEYS);
@@ -50,13 +51,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         Long id = keyHolder.getKey().longValue();
         schedule.setId(id);
 
-        return schedule;
+        return Optional.of(schedule);
     } // DB 저장
 
     @Override
-    public Schedule schedule(ScheduleViewDto scheduleViewDto) {
+    public Optional<Schedule> schedule(Long id) {
         // DB 조회
-        String sql = "SELECT id, to_do, manager, created_at FROM todo_list WHERE id = ?";
+        String sql = "SELECT id, to_do, manager_id, created_at FROM todo_list WHERE id = ?";
 
         return jdbcTemplate.query(sql, resultSet -> {
             if(resultSet.next()) {
@@ -71,67 +72,65 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 // LocalDateTime을 포맷된 문자열로 변환
                 String formattedDateTime = resultSet.getTimestamp("created_at").toLocalDateTime().format(formatter);
                 schedule.setCreatedAt(formattedDateTime);
-                return schedule;
+                return Optional.of(schedule);
             } else {
-                return null;
+                return Optional.empty();
             }
-        }, scheduleViewDto.getId());
+        }, id);
     }
 
     @Override
-    public List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto) {
-        String sql = "SELECT id, to_do, manager, created_at, updated_at FROM todo_list where 1=1";
+    public Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto) {
+        String sql = "SELECT id, to_do, manager_id, created_at, updated_at FROM todo_list where 1=1";
         if(!scheduleViewsDto.getUpdatedAt().equals("")){
             sql += " and updated_at like '%"+scheduleViewsDto.getUpdatedAt()+"%'";
         }
 
-        if(!scheduleViewsDto.getManagerId().equals("")){
-            sql += " and manager = '"+scheduleViewsDto.getManagerId() + "'";
+        if(scheduleViewsDto.getManagerId() != null && !scheduleViewsDto.getManagerId().equals("")){
+            sql += " and manager_id = '"+scheduleViewsDto.getManagerId() + "'";
         }
 
-        return jdbcTemplate.query(sql, new RowMapper<Schedule>() {
+        List<Schedule> schedules = jdbcTemplate.query(sql, new RowMapper<Schedule>() {
             @Override
             public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
-                // SQL 의 결과로 받아온 Memo 데이터들을 MemoResponseDto 타입으로 변환해줄 메서드
-                Schedule schedule = Schedule.builder()
+                return Schedule.builder()
                         .id(rs.getLong("id"))
                         .toDo(rs.getString("to_do"))
                         .managerId(rs.getLong("manager_id"))
                         .createdAt(rs.getString("created_at"))
                         .build();
-                return schedule;
             }
         });
+
+        return Optional.of(schedules);
+
     }
 
     @Override
     @Transactional
-    public Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto) {
+    public Optional<Schedule> updateSchedule(ScheduleUpdateDto scheduleUpdateDto) {
         Schedule schedule = findById(scheduleUpdateDto.getId());
-        if(schedule != null) {
 
-            if(schedule.getPassword().equals(scheduleUpdateDto.getPassword())){
-                // memo 내용 수정
-                String sql = "UPDATE todo_list SET to_do = ?, manager = ?, updated_at = SYSDATE()  WHERE id = ?";
-                jdbcTemplate.update(sql, scheduleUpdateDto.getToDo(), scheduleUpdateDto.getManagerId(), schedule.getId());
+        if(schedule != null && schedule.getPassword().equals(scheduleUpdateDto.getPassword())){
+            // memo 내용 수정
+            String sql = "UPDATE todo_list SET to_do = ?, manager_id = ?, updated_at = SYSDATE()  WHERE id = ?";
+            jdbcTemplate.update(sql, scheduleUpdateDto.getToDo(), scheduleUpdateDto.getManagerId(), schedule.getId());
 
-                return Schedule.builder()
-                        .id(schedule.getId())
-                        .toDo(schedule.getToDo())
-                        .managerId(schedule.getManagerId())
-                        .updatedAt(schedule.getUpdatedAt())
-                        .build();
-            }else{
-                return null;
-            }
-        } else {
-            throw new IllegalArgumentException("선택한 메모는 존재하지 않습니다.");
+            return Optional.of(Schedule.builder()
+                    .id(schedule.getId())
+                    .toDo(schedule.getToDo())
+                    .managerId(schedule.getManagerId())
+                    .updatedAt(schedule.getUpdatedAt())
+                    .build());
+        }else{
+            return Optional.empty();
         }
+
     }
 
     @Override
     @Transactional
-    public Schedule deleteSchedule(ScheduleDeleteDto scheduleDeleteDto) {
+    public boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto) {
         Schedule schedule = findById(scheduleDeleteDto.getId());
         if(schedule != null) {
 
@@ -140,11 +139,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 String sql = "DELETE FROM todo_list WHERE id = ?";
                 jdbcTemplate.update(sql, schedule.getId());
 
-                return Schedule.builder()
-                        .id(schedule.getId())
-                        .build();
+                return true;
             }else{
-                return null;
+                return false;
             }
         } else {
             throw new IllegalArgumentException("선택한 메모는 존재하지 않습니다.");
@@ -153,7 +150,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     private Schedule findById(Long id) {
         // DB 조회
-        String sql = "SELECT id, to_do, manager, password, created_at, updated_at FROM todo_list WHERE id = ?";
+        String sql = "SELECT id, to_do, manager_id, password, created_at, updated_at FROM todo_list WHERE id = ?";
 
         return jdbcTemplate.query(sql, resultSet -> {
             if(resultSet.next()) {

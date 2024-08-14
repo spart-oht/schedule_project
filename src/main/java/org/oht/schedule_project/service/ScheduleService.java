@@ -1,24 +1,27 @@
 package org.oht.schedule_project.service;
 
 
+import org.oht.schedule_project.domain.Schedule;
 import org.oht.schedule_project.dto.request.*;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface ScheduleService {
 
     // 일정 작성
-    ResponseEntity<?> insertSchedule(ScheduleInsertDto scheduleInsertDto);
+    Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto);
 
     // 선택한 일정 조회
-    ResponseEntity<?> schedule(ScheduleViewDto scheduleViewDto);
+    Schedule findIdSchedule(Long id);
 
     // 일정 목록 조회
-    ResponseEntity<?> schedules(ScheduleViewsDto scheduleViewsDto);
+    List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto);
 
     // 선택한 일정 수정
-    ResponseEntity<?> updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
+    Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
 
     // 선택한 일정 삭제
-    ResponseEntity<?> deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
+    boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
 
 }
