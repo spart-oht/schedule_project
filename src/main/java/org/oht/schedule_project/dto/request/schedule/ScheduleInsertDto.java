@@ -14,7 +14,7 @@ public class ScheduleInsertDto {
 
     private Long managerId;
 
-    @NotNull
+    @NotNull(message = "비밀번호는 필수 파라미터 입니다.")
     private String password;
 
 }

@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class ScheduleUpdateDto {
 
-    @NotNull
+    @NotNull(message = "id 는 필수 파라미터 입니다.")
     private Long id;
 
     @Nullable
@@ -18,7 +18,7 @@ public class ScheduleUpdateDto {
 
     private Long managerId;
 
-    @NotNull
+    @NotNull(message = "비밀번호는 필수 파라미터 입니다.")
     private String password;
 
 }
