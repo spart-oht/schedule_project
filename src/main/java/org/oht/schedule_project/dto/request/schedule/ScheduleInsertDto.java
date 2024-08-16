@@ -17,8 +17,4 @@ public class ScheduleInsertDto {
     @NotNull
     private String password;
 
-    private String createdAt;
-
-    private String updatedAt;
-
 }

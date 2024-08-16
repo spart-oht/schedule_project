@@ -11,8 +11,7 @@ import org.oht.schedule_project.dto.request.schedule.ScheduleUpdateDto;
 import org.oht.schedule_project.dto.request.schedule.ScheduleViewsDto;
 import org.oht.schedule_project.dto.response.CommonResponseDto;
 import org.oht.schedule_project.dto.response.schedule.ScheduleResponseDto;
-import org.oht.schedule_project.enums.StatusEnum;
-import org.oht.schedule_project.service.ScheduleService;
+import org.oht.schedule_project.service.schedule.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/edit")
-    public ResponseEntity<?> insertSchedule(@Valid @RequestBody ScheduleInsertDto scheduleInsertDto) {
+    public ResponseEntity<CommonResponseDto<ScheduleResponseDto>> insertSchedule(@Valid @RequestBody ScheduleInsertDto scheduleInsertDto) {
 
         Schedule schedule = scheduleService.insertSchedule(scheduleInsertDto);
 
@@ -41,20 +40,13 @@ public class ScheduleController {
                 .createdAt(schedule.getCreatedAt())
                 .build();
 
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDto)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK, "success", scheduleResponseDto), HttpStatus.OK);
 
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/{id}")
     // @PathVariable Long id 사용가능
-    public ResponseEntity<?> scheduleView(@PathVariable Long id) {
+    public ResponseEntity<CommonResponseDto<ScheduleResponseDto>> scheduleView(@PathVariable Long id) {
 
         Schedule schedule = scheduleService.findIdSchedule(id);
 
@@ -65,18 +57,11 @@ public class ScheduleController {
                 .createdAt(schedule.getCreatedAt())
                 .build();
 
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDto)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK, "success", scheduleResponseDto), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> scheduleViews(@RequestBody ScheduleViewsDto scheduleViewsDto, @RequestParam int pageNum, @RequestParam int pageSize) {
+    public ResponseEntity<CommonResponseDto<List<ScheduleResponseDto>>> scheduleViews(@RequestBody ScheduleViewsDto scheduleViewsDto, @RequestParam int pageNum, @RequestParam int pageSize) {
 
         // 페이징 처리용
         scheduleViewsDto.setPageNum(pageNum);
@@ -96,20 +81,13 @@ public class ScheduleController {
                             .build());
         }
 
-        // Entity -> ResponseDto
-        CommonResponseDto commonResponse = CommonResponseDto.builder()
-                .status(StatusEnum.OK.getCode())
-                .message("success")
-                .data(scheduleResponseDtos)
-                .build();
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK, "success", scheduleResponseDtos), HttpStatus.OK);
     }
 
     @PutMapping("/update")
     // 보안에 취약하기 떄문에 PathVariable 은 생략
     // @PathVariable Long id,
-    public ResponseEntity<?> updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto) {
+    public ResponseEntity<CommonResponseDto<ScheduleResponseDto>> updateSchedule(@RequestBody ScheduleUpdateDto scheduleUpdateDto) {
 
         Schedule updateSchedule = scheduleService.updateSchedule(scheduleUpdateDto);
 
@@ -119,48 +97,17 @@ public class ScheduleController {
                 .updatedAt(updateSchedule.getUpdatedAt())
                 .build();
 
-        CommonResponseDto commonResponse;
-
-        if (updateSchedule == null) {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.BAD_REQUEST.getCode())
-                    .message("비밀번호가 일치하지 않습니다.")
-                    .data(scheduleResponseDto)
-                    .build();
-        } else {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.OK.getCode())
-                    .message("success")
-                    .data(scheduleResponseDto)
-                    .build();
-        }
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK, "success", scheduleResponseDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
     // 보안에 취약하기 떄문에 PathVariable 은 생략
     // @PathVariable Long id,
-    public ResponseEntity<?> deleteSchedule(@RequestBody ScheduleDeleteDto scheduleDeleteDto) {
-        boolean deleteSchedule = scheduleService.deleteSchedule(scheduleDeleteDto);
+    public ResponseEntity<CommonResponseDto<Void>> deleteSchedule(@RequestBody ScheduleDeleteDto scheduleDeleteDto) {
 
-        CommonResponseDto commonResponse;
+        scheduleService.deleteSchedule(scheduleDeleteDto);
 
-        if (deleteSchedule == true) {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.OK.getCode())
-                    .message("success")
-                    .data(null)
-                    .build();
-        } else {
-            commonResponse = CommonResponseDto.builder()
-                    .status(StatusEnum.BAD_REQUEST.getCode())
-                    .message("비밀번호가 일치하지 않습니다.")
-                    .data(null)
-                    .build();
-        }
-
-        return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK, "success", null), HttpStatus.OK);
     }
 
 }

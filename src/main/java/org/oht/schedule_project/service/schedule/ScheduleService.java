@@ -1,4 +1,4 @@
-package org.oht.schedule_project.service;
+package org.oht.schedule_project.service.schedule;
 
 
 import org.oht.schedule_project.domain.Schedule;
@@ -24,6 +24,6 @@ public interface ScheduleService {
     Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
 
     // 선택한 일정 삭제
-    boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
+    void deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
 
 }

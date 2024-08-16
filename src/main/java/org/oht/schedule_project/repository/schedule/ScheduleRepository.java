@@ -1,4 +1,4 @@
-package org.oht.schedule_project.repository;
+package org.oht.schedule_project.repository.schedule;
 
 import org.oht.schedule_project.domain.Schedule;
 import org.oht.schedule_project.dto.request.schedule.ScheduleDeleteDto;
@@ -11,14 +11,14 @@ import java.util.Optional;
 
 public interface ScheduleRepository {
 
-    Optional<Schedule> insertSchedule(ScheduleInsertDto scheduleInsertDto);
+    Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto);
 
-    Optional<Schedule> schedule(Long id);
+    Schedule schedule(Long id);
 
-    Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto);
+    List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto);
 
-    Optional<Schedule> updateSchedule(ScheduleUpdateDto scheduleUpdateDto);
+    Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto, Schedule schedule);
 
-    boolean deleteSchedule(ScheduleDeleteDto scheduleDeleteDto);
+    int deleteSchedule(ScheduleDeleteDto scheduleDeleteDto, Schedule schedule);
 
 }

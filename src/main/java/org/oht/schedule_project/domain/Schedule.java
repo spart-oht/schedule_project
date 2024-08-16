@@ -28,8 +28,6 @@ public class Schedule {
         this.toDo = scheduleInsertDto.getToDo();
         this.managerId = scheduleInsertDto.getManagerId();
         this.password = scheduleInsertDto.getPassword();
-        this.createdAt = scheduleInsertDto.getCreatedAt();
-        this.updatedAt = scheduleInsertDto.getUpdatedAt();
     }
 
 }

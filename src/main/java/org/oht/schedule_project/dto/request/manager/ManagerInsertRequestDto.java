@@ -8,13 +8,10 @@ import lombok.Getter;
 @Getter
 public class ManagerInsertRequestDto {
 
-    @NotNull
+    @NotNull(message = "이름은 필수값 입니다.")
     private String name;
 
-    @Email
+    @NotNull(message = "이메일은 필수값 입니다.")
+    @Email(message = "잘못된 형식의 email 입니다.")
     private String email;
-
-    private String createdAt;
-
-    private String updatedAt;
 }
