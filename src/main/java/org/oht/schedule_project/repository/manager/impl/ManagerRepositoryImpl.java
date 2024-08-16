@@ -52,7 +52,7 @@ public class ManagerRepositoryImpl implements ManagerRepository {
         return manager;
     }
 
-    public Manager findByManagerId(Long id) {
+    public Optional<Manager> findByManagerId(Long id) {
         // DB 조회
         String sql = "SELECT id, name, email, created_at, updated_at FROM manager WHERE id = ?";
 
@@ -64,9 +64,9 @@ public class ManagerRepositoryImpl implements ManagerRepository {
                 manager.setEmail(resultSet.getString("email"));
                 manager.setCreatedAt(resultSet.getString("created_at"));
                 manager.setUpdatedAt(resultSet.getString("updated_at"));
-                return manager;
+                return Optional.of(manager);
             } else {
-                return null;
+                return Optional.empty();
             }
         }, id);
     }

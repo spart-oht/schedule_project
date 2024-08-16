@@ -11,13 +11,13 @@ import java.util.Optional;
 
 public interface ScheduleRepository {
 
-    Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto);
+    Optional<Schedule> insertSchedule(ScheduleInsertDto scheduleInsertDto);
 
-    Schedule schedule(Long id);
+    Optional<Schedule> schedule(Long id);
 
-    List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto);
+    Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto);
 
-    Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto, Schedule schedule);
+    Optional<Schedule> updateSchedule(ScheduleUpdateDto scheduleUpdateDto, Schedule schedule);
 
     int deleteSchedule(ScheduleDeleteDto scheduleDeleteDto, Schedule schedule);
 

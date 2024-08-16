@@ -27,37 +27,37 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Schedule insertSchedule(ScheduleInsertDto ScheduleInsertDto) {
 
-        Optional.ofNullable(managerRepository.findByManagerId(ScheduleInsertDto.getManagerId())).orElseThrow(() -> new NoSuchElementException("해당 id 로 등록된 매니저가 없습니다."));
+        managerRepository.findByManagerId(ScheduleInsertDto.getManagerId()).orElseThrow(() -> new NoSuchElementException("해당 id 로 등록된 매니저가 없습니다."));
 
-        return Optional.ofNullable(scheduleRepository.insertSchedule(ScheduleInsertDto)).orElseThrow(() -> new RuntimeException("등록에 실패하였습니다."));
+        return scheduleRepository.insertSchedule(ScheduleInsertDto).orElseThrow(() -> new RuntimeException("등록에 실패하였습니다."));
     }
 
     @Override
     public Schedule findIdSchedule(Long id) {
-        return Optional.of(scheduleRepository.schedule(id)).orElse(new Schedule());
+        return scheduleRepository.schedule(id).orElse(new Schedule());
     }
 
     @Override
     public List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto){
-        return Optional.of(scheduleRepository.schedules(scheduleViewsDto)).orElse(new ArrayList<>());
+        return scheduleRepository.schedules(scheduleViewsDto).orElse(new ArrayList<>());
     }
 
     @Override
     public Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto){
 
         // 데이터 존재 확인
-        Schedule schedule = Optional.ofNullable(scheduleRepository.findByScheduleId(scheduleUpdateDto.getId())).orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
+        Schedule schedule = scheduleRepository.findByScheduleId(scheduleUpdateDto.getId()).orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
 
         // 변경하려는 매니저의 데이터 확인
         Optional.ofNullable(managerRepository.findByManagerId(scheduleUpdateDto.getManagerId())).orElseThrow(() -> new NoSuchElementException("해당 id 로 등록된 매니저가 없습니다."));
 
-        return Optional.of(scheduleRepository.updateSchedule(scheduleUpdateDto, schedule)).orElseThrow(() -> new RuntimeException("수정에 실패하였습니다."));
+        return scheduleRepository.updateSchedule(scheduleUpdateDto, schedule).orElseThrow(() -> new RuntimeException("수정에 실패하였습니다."));
     }
 
     @Override
     public void deleteSchedule(ScheduleDeleteDto scheduleDeleteDto){
         // 데이터 존재 확인
-        Schedule schedule = Optional.ofNullable(scheduleRepository.findByScheduleId(scheduleDeleteDto.getId())).orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
+        Schedule schedule = scheduleRepository.findByScheduleId(scheduleDeleteDto.getId()).orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
 
         // 해당 메모가 DB에 존재하는지 확인
         if(scheduleRepository.deleteSchedule(scheduleDeleteDto, schedule) == 0) throw new RuntimeException("삭제에 실패하였습니다.");

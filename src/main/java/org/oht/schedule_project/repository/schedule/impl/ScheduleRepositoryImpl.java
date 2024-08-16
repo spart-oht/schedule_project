@@ -2,6 +2,7 @@ package org.oht.schedule_project.repository.schedule.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.oht.schedule_project.domain.Schedule;
 import org.oht.schedule_project.dto.request.schedule.ScheduleDeleteDto;
 import org.oht.schedule_project.dto.request.schedule.ScheduleInsertDto;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ScheduleRepositoryImpl implements ScheduleRepository {
@@ -29,7 +31,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Transactional
     @Override
-    public Schedule insertSchedule(ScheduleInsertDto scheduleInsertDto){
+    public Optional<Schedule> insertSchedule(ScheduleInsertDto scheduleInsertDto) {
 
         Schedule schedule = new Schedule(scheduleInsertDto);
 
@@ -53,11 +55,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         Long id = keyHolder.getKey().longValue();
         schedule.setId(id);
 
-        return schedule;
+        return Optional.of(schedule);
     } // DB 저장
 
     @Override
-    public Schedule schedule(Long id) {
+    public Optional<Schedule> schedule(Long id) {
         // DB 조회
         String sql = "SELECT id, to_do, manager_id, created_at FROM todo_list WHERE id = ?";
 
@@ -74,15 +76,15 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 // LocalDateTime을 포맷된 문자열로 변환
                 String formattedDateTime = resultSet.getTimestamp("created_at").toLocalDateTime().format(formatter);
                 schedule.setCreatedAt(formattedDateTime);
-                return schedule;
+                return Optional.of(schedule);
             } else {
-                return null;
+                return Optional.empty();
             }
         }, id);
     }
 
     @Override
-    public List<Schedule> schedules(ScheduleViewsDto scheduleViewsDto) {
+    public Optional<List<Schedule>> schedules(ScheduleViewsDto scheduleViewsDto) {
         String sql = "SELECT a.id, a.manager_id, a.to_do, b.name, a.created_at, b.updated_at FROM todo_list as a join manager as b on a.manager_id = b.id where 1=1";
         if(!scheduleViewsDto.getUpdatedAt().equals("")){
             sql += " and a.updated_at like '%"+scheduleViewsDto.getUpdatedAt()+"%'";
@@ -100,7 +102,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
             sql += " OFFSET " + scheduleViewsDto.getPageSize() * (scheduleViewsDto.getPageNum() - 1);
         }
 
-        List<Schedule> schedules = jdbcTemplate.query(sql, new RowMapper<Schedule>() {
+        log.info(sql);
+
+        return Optional.of(jdbcTemplate.query(sql, new RowMapper<Schedule>() {
             @Override
             public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return Schedule.builder()
@@ -110,27 +114,25 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         .createdAt(rs.getString("created_at"))
                         .build();
             }
-        });
-
-        return schedules;
+        }));
 
     }
 
     @Override
     @Transactional
-    public Schedule updateSchedule(ScheduleUpdateDto scheduleUpdateDto, Schedule schedule) {
+    public Optional<Schedule> updateSchedule(ScheduleUpdateDto scheduleUpdateDto, Schedule schedule) {
 
         if(schedule.getPassword().equals(scheduleUpdateDto.getPassword())){
             // memo 내용 수정
             String sql = "UPDATE todo_list SET to_do = ?, manager_id = ?, updated_at = SYSDATE()  WHERE id = ?";
             jdbcTemplate.update(sql, schedule.getToDo(), schedule.getManagerId(), schedule.getId());
 
-            return Schedule.builder()
+            return Optional.of(Schedule.builder()
                     .id(schedule.getId())
                     .toDo(schedule.getToDo())
                     .managerId(schedule.getManagerId())
                     .updatedAt(schedule.getUpdatedAt())
-                    .build();
+                    .build());
         }else{
             throw new NoSuchElementException("패스워드가 일치하지 않습니다.");
         }
@@ -152,7 +154,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         }
     }
 
-    public Schedule findByScheduleId(Long id) {
+    public Optional<Schedule> findByScheduleId(Long id) {
         // DB 조회
         String sql = "SELECT id, to_do, manager_id, password, created_at, updated_at FROM todo_list WHERE id = ?";
 
@@ -165,9 +167,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 schedule.setPassword(resultSet.getString("password"));
                 schedule.setCreatedAt(resultSet.getString("created_at"));
                 schedule.setUpdatedAt(resultSet.getString("updated_at"));
-                return schedule;
+                return Optional.of(schedule);
             } else {
-                return null;
+                return Optional.empty();
             }
         }, id);
     }
