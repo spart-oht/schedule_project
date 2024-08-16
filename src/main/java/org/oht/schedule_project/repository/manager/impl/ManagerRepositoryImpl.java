@@ -27,7 +27,7 @@ public class ManagerRepositoryImpl implements ManagerRepository {
 
     @Override
     @Transactional
-    public Manager insertManager(ManagerInsertRequestDto managerInsertRequestDto) {
+    public Optional<Manager> insertManager(ManagerInsertRequestDto managerInsertRequestDto) {
         Manager manager = new Manager(managerInsertRequestDto);
 
         KeyHolder keyHolder = new GeneratedKeyHolder(); // 기본 키를 반환받기 위한 객체
@@ -49,7 +49,7 @@ public class ManagerRepositoryImpl implements ManagerRepository {
         Long id = keyHolder.getKey().longValue();
         manager.setId(id);
 
-        return manager;
+        return Optional.of(manager);
     }
 
     public Optional<Manager> findByManagerId(Long id) {

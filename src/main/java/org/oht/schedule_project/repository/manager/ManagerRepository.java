@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface ManagerRepository {
 
-    Manager insertManager(ManagerInsertRequestDto managerInsertRequestDto);
+    Optional<Manager> insertManager(ManagerInsertRequestDto managerInsertRequestDto);
 
 }

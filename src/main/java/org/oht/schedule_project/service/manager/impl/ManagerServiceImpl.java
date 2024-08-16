@@ -20,8 +20,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public Manager editManager(ManagerInsertRequestDto managerInsertRequestDto) {
-        return Optional.ofNullable(
-                managerRepository.insertManager(managerInsertRequestDto)).orElseThrow(
+        return managerRepository.insertManager(managerInsertRequestDto).orElseThrow(
                 () -> new RuntimeException("등록에 실패하였습니다.")
         );
     }
